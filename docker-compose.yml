@@ -1,0 +1,92 @@
+version: '1.0.0'
+
+services:
+  predixy:
+    image: haandol/predixy
+    container_name: predixy
+    hostname: predixy
+    command: predixy /etc/predixy/conf/predixy.conf
+    volumes:
+      - ./redis-data/predixy.conf:/etc/predixy/conf/predixy.conf
+      - ./redis-data/predixy.log:/etc/logs/predixy.log
+    ports:
+      - '6379:6379'
+    networks:
+      - redis-net
+
+  master1:
+    image: redis:latest
+    container_name: master1
+    volumes:
+      - ./redis-data/opt/redis/8000/8000.conf:/usr/local/etc/redis_8000.conf
+      - ./redis-data/start.sh:/start.sh
+    command: sh -c "redis-server /usr/local/etc/redis_8000.conf"
+    ports:
+      - '8000:8000'
+      - '18000:18000'
+    networks:
+      - redis-net
+
+  master2:
+    image: redis:latest
+    container_name: master2
+    volumes:
+      - ./redis-data/opt/redis/8001/8001.conf:/usr/local/etc/redis_8001.conf
+    command: sh -c "redis-server /usr/local/etc/redis_8001.conf"
+    ports:
+      - '8001:8001'
+      - '18001:18001'
+    networks:
+      - redis-net
+
+  master3:
+    image: redis:latest
+    container_name: master3
+    volumes:
+      - ./redis-data/opt/redis/8002/8002.conf:/usr/local/etc/redis_8002.conf
+    command: sh -c "redis-server /usr/local/etc/redis_8002.conf"
+    ports:
+      - '8002:8002'
+      - '18002:18002'
+    networks:
+      - redis-net
+
+  slave1:
+    image: redis:latest
+    container_name: slave1
+    volumes:
+      - ./redis-data/opt/redis/8100/8100.conf:/usr/local/etc/redis_8100.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_8100.conf"
+    ports:
+      - '8100:8100'
+      - '18100:18100'
+    networks:
+      - redis-net
+
+  slave2:
+    image: redis:latest
+    container_name: slave2
+    volumes:
+      - ./redis-data/opt/redis/8101/8101.conf:/usr/local/etc/redis_8101.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_8101.conf"
+    ports:
+      - '8101:8101'
+      - '18101:18101'
+    networks:
+      - redis-net
+
+  slave3:
+    image: redis:latest
+    container_name: slave3
+    volumes:
+      - ./redis-data/opt/redis/8102/8102.conf:/usr/local/etc/redis_8102.conf
+    command: sh -c "sleep 3 && redis-server /usr/local/etc/redis_8102.conf"
+    ports:
+      - '8102:8102'
+      - '18102:18102'
+    networks:
+      - redis-net
+
+networks:
+  redis-net:
+    driver: bridge
