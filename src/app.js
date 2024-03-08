@@ -3,8 +3,7 @@ const { createServer } = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const { createConnection } = require('./router/socket.router');
-const { createClient } = require('redis');
-const { createAdapter } = require('@socket.io/redis-adapter');
+const { setupRedisAdapter } = require('./utils/setupAdaspter');
 
 const { FRONT_URL } = process.env;
 
@@ -22,18 +21,7 @@ const io = new Server(server, {
   transports: ['websocket'],
 });
 
-const url = `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
-
-const pubClient = createClient({
-  url,
-  password: process.env.REDIS_PASSWORD,
-});
-const subClient = pubClient.duplicate();
-
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  console.log('Redis client connected');
-  io.adapter(createAdapter(pubClient, subClient));
-});
+setupRedisAdapter(io);
 
 io.on('connection', (socket) => {
   createConnection(socket, io);
