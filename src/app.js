@@ -27,7 +27,8 @@ const redis = new Redis(io);
 redis.setupRedisAdapter();
 
 io.on('connection', (socket) => {
-  createConnection(socket, io);
+  createConnection(socket, io, redis.pubClient);
+  console.log(`client socekt id : ${socket.id} `);
 });
 
 app.use(cors({ origin: FRONT_URL.split(','), credentials: true }));
