@@ -26,7 +26,14 @@ class UserHandler {
     this.socket.join(data.room);
 
     console.log('join Room Data : ', data);
-    await this.redis.sAdd(`room:${data.room}:users`, data.userId);
+    this.redis
+      .sAdd(`room:${data.room}:users`, data.userId)
+      .then(() => {
+        console.log('redis sAdd success');
+      })
+      .catch((err) => {
+        console.log('redis sAdd error : ', err);
+      });
 
     cb({ ok: true, message: 'Joined room' });
   };
