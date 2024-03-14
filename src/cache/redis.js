@@ -1,29 +1,56 @@
-const { createClient } = require('redis');
+// const { createCluster } = require('redis');
+const IoRedis = require('ioredis');
 const { createAdapter } = require('@socket.io/redis-adapter');
+
+const {
+  REDIS_CLUSTER_HOST_1,
+  REDIS_CLUSTER_HOST_2,
+  REDIS_CLUSTER_HOST_3,
+  REDIS_CLUSTER_PORT,
+  REDIS_PASSWORD,
+} = process.env;
 
 class Redis {
   constructor(io) {
     this.io = io;
     this.pubClient = null;
     this.subClient = null;
+    this.init();
   }
 
-  setupRedisAdapter() {
-    const url = `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
-    this.pubClient = createClient({
-      url,
-      password: process.env.REDIS_PASSWORD,
-    });
-    this.subClient = this.pubClient.duplicate();
+  init() {
+    const clusterNodes = [
+      {
+        host: REDIS_CLUSTER_HOST_1,
+        port: REDIS_CLUSTER_PORT,
+      },
+      {
+        host: REDIS_CLUSTER_HOST_2,
+        port: REDIS_CLUSTER_PORT,
+      },
+      {
+        host: REDIS_CLUSTER_HOST_3,
+        port: REDIS_CLUSTER_PORT,
+      },
+    ];
 
-    Promise.all([this.pubClient.connect(), this.subClient.connect()])
-      .then(() => {
-        console.log('Redis client connected');
-        this.io.adapter(createAdapter(this.pubClient, this.subClient));
-      })
-      .catch((err) => {
-        console.error('Redis client connection error : ', err);
-      });
+    const options = {
+      redisOptions: {
+        password: REDIS_PASSWORD,
+      },
+    };
+
+    const pubClient = new IoRedis.Cluster(clusterNodes, options);
+    const subClient = new IoRedis.Cluster(clusterNodes, options);
+
+    this.io.adapter(createAdapter(pubClient, subClient));
+
+    pubClient
+      .on('connect', () => console.log('Redis pubClient connected'))
+      .on('error', (err) => console.error('Redis pubClient error : ', err));
+    subClient
+      .on('connect', () => console.log('Redis subClient connected'))
+      .on('error', (err) => console.error('Redis subClient error : ', err));
   }
 }
 

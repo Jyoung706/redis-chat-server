@@ -24,7 +24,7 @@ const io = new Server(server, {
 
 const redis = new Redis(io);
 
-redis.setupRedisAdapter();
+// redis.setupRedisAdapter();
 
 io.on('connection', (socket) => {
   createConnection(socket, io, redis.pubClient);
