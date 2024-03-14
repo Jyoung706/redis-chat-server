@@ -40,15 +40,15 @@ class Redis {
       },
     };
 
-    const pubClient = new IoRedis.Cluster(clusterNodes, options);
-    const subClient = new IoRedis.Cluster(clusterNodes, options);
+    this.pubClient = new IoRedis.Cluster(clusterNodes, options);
+    this.subClient = new IoRedis.Cluster(clusterNodes, options);
 
-    this.io.adapter(createAdapter(pubClient, subClient));
+    this.io.adapter(createAdapter(this.pubClient, this.subClient));
 
-    pubClient
+    this.pubClient
       .on('connect', () => console.log('Redis pubClient connected'))
       .on('error', (err) => console.error('Redis pubClient error : ', err));
-    subClient
+    this.subClient
       .on('connect', () => console.log('Redis subClient connected'))
       .on('error', (err) => console.error('Redis subClient error : ', err));
   }
