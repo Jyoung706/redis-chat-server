@@ -8,6 +8,7 @@ const createConnection = async (socket, io, redis) => {
   socket.on('login', userHandler.userConnect);
   socket.on('sendMessage', userHandler.sendMessage);
   socket.on('joinRoom', userHandler.joinRoom);
+  socket.on('leaveRoom', userHandler.leaveRoom);
 };
 
 module.exports = { createConnection };
