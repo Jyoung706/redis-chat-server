@@ -27,7 +27,7 @@ class UserHandler {
 
     console.log('join Room Data : ', data);
     this.redis
-      .sAdd(`room:${data.room}:users`, data.userId)
+      .sadd(`room:${data.room}:users`, data.userId)
       .then(() => {
         console.log('redis sAdd success');
       })
