@@ -3,7 +3,6 @@ const { createServer } = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const { createConnection } = require('./router/socket.router');
-const { setupRedisAdapter } = require('./utils/setupAdaspter');
 const Redis = require('../src/cache/redis');
 
 const { FRONT_URL } = process.env;
@@ -23,8 +22,6 @@ const io = new Server(server, {
 });
 
 const redis = new Redis(io);
-
-// redis.setupRedisAdapter();
 
 io.on('connection', (socket) => {
   createConnection(socket, io, redis.pubClient);
