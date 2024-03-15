@@ -12,7 +12,8 @@ class UserHandler {
     this.io.emit('updateRoomUsers', { users, counts });
   };
 
-  userConnect = (data, cb) => {
+  userConnect = async (data, cb) => {
+    console.log(await this.redis.smembers('room:2:users'));
     cb({ ok: true, message: 'User connected' });
     // this.redis.set('user', JSON.stringify(callback));
   };

@@ -4,6 +4,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const { createConnection } = require('./router/socket.router');
 const Redis = require('../src/cache/redis');
+const mongoConn = require('./utils/dbconn');
 
 const { FRONT_URL } = process.env;
 
@@ -11,6 +12,8 @@ const app = express();
 const server = createServer(app);
 
 app.use(express.json());
+
+mongoConn();
 
 const io = new Server(server, {
   cors: {
